@@ -1,7 +1,9 @@
+import datetime
 from django.http import HttpResponseRedirect,JsonResponse
 from django.shortcuts import render , redirect
 from django.forms.models import model_to_dict
-from .models import Usuarios, FormSolicitud  
+from django.db.models import F
+from .models import *
 from .forms import RegisterForm 
 
 def index(request):
@@ -72,6 +74,7 @@ def index(request):
 
 def logout(request):
     request.session.flush()
+    request.session['carrito'] = {}
     response = JsonResponse({'success': 'Sesion cerrada'})
     response.status_code = 200
     HttpResponseRedirect('/')
@@ -92,7 +95,6 @@ def validacionRegistrar(request):
     else:
         context['registro_vacio'] = False
     return HttpResponseRedirect('/')
-    
 
 def contactanos(request):
     return render(request, 'CommunityPlant/contactanos.html')
@@ -169,6 +171,7 @@ def borrarperfil(request):
             if Usuarios(**request.session['user']) == user:
                 Usuarios(**request.session['user']).delete()
                 request.session.flush()
+                request.session['carrito'] = {}
                 print("pase el delete")
                 return redirect(to="index")
         else:
@@ -209,4 +212,61 @@ def modperfil(request):
         context['Usuario']=user
         request.session['user']=model_to_dict(user)
     return render(request,'CommunityPlant/ModPerfil.html',context)
-# Create your views here.
+
+def catalogo(request):
+    cartas = CatalogoPlantas.objects.all()
+    datos = {
+        'cartas': cartas
+    }
+    if request.method == 'POST':
+        if CatalogoPlantas.objects.filter(nombrePlanta = request.POST['nombre']).exists():
+            cant = int(request.POST['cantidad'])
+            plantaComprar = CatalogoPlantas.objects.get(nombrePlanta = request.POST['nombre'])
+            if  1 <= cant <= plantaComprar.stockPlanta:
+                #plantaComprar.stockPlanta -= cant
+                #plantaComprar.save()
+                try:
+                    print('try1')
+                    if plantaComprar.nombrePlanta not in request.session['carrito']:
+                        print('try1 if')
+                        request.session['carrito'][plantaComprar.nombrePlanta] = {'cantidad':cant, 'precio_unitario':plantaComprar.precioPlanta}
+                    else:
+                        print('try1 else')
+                        request.session['carrito'][plantaComprar.nombrePlanta]['cantidad'] += cant
+                except KeyError as e:
+                    print('try1 except')
+                    request.session['carrito'] = {}
+                    request.session['carrito'][plantaComprar.nombrePlanta] = {'cantidad':cant, 'precio_unitario':plantaComprar.precioPlanta}
+    try:
+        print('try2')
+        datos['carrito'] = request.session['carrito']
+    except KeyError as e:
+        print('try2 except')
+        datos['carrito'] = {}
+        request.session['carrito'] = {}
+    print(datos)
+    return render(request, 'CommunityPlant/catalogo.html', datos)
+
+def limpiarCarroto(request):
+    request.session['carrito'] = {}
+    return redirect(to="Catalogo")
+
+def boleton(request):
+    if len(request.session['carrito']) == 0:
+        return redirect(to="Catalogo")
+    else:
+        datos = {}
+        datos['carrito'] = request.session['carrito']
+        precioTotal = sum([int(j['cantidad']) * int(j['precio_unitario']) for i, j in request.session['carrito'].items()])
+        print(precioTotal)
+        boletita = boleta(precioTotal = precioTotal, fecha = datetime.datetime.now())
+        boletita.save()
+        datos['boleta'] = boletita
+        for key, value in request.session['carrito'].items():
+            planta = CatalogoPlantas.objects.get(nombrePlanta = key)
+            planta.stockPlanta -= value['cantidad']
+            planta.save()
+        request.session['carrito'] = {}
+        return render(request, 'CommunityPlant/boleta.html', datos)
+
+# Create your views here.datos

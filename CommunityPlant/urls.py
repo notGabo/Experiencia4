@@ -1,4 +1,3 @@
-
 from django.urls import path 
 from .views import *
 
@@ -18,5 +17,8 @@ urlpatterns = [
     path('Perfil.html', perfil, name='Perfil'),
     path('BorrarPerfil/', borrarperfil, name='BorrarPerfil'),
     path('ModPerfil.html', modperfil, name="Modificar Perfil"),
-    path('resetPassword.html',resetPassword, name="resetear contraseña")
+    path('resetPassword.html',resetPassword, name="resetear contraseña"),
+    path('catalogo.html', catalogo, name="Catalogo"),
+    path('limpiarCarroto/',limpiarCarroto, name='Limpiar carroto'),
+    path('boleta/',boleton, name='boleta'),
 ]
