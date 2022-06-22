@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'CommunityPlant',
     'Experiencia4',
+    'rest_framework',
+    'rest_descuento',
     
 ]
 
