@@ -1,4 +1,5 @@
 from tabnanny import verbose
+from tkinter import commondialog
 from django.db import models
 
 class Usuarios(models.Model):
@@ -52,6 +53,11 @@ class boleta(models.Model):
 
     def __str__(self):
         return str(self.idBoleta)
+class Descuento(models.Model):
+    IdCodigo= models.CharField(max_length=30,primary_key=True,verbose_name='Id Codigo')
+    Porcentaje= models.IntegerField(null=False,blank=False,verbose_name='Porcentaje Descuento')
 
+    def __str__(self):
+        return str(self.IdCodigo)
 ## Create your models here.
 
