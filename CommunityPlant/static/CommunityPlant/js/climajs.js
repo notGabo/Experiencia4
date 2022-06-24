@@ -1,5 +1,4 @@
-$(document).ready(function(){
-          
+$({document}).ready(function(){  
     $.ajax({
             url:"https://api.weatherapi.com/v1/forecast.json?key=7623d859c2064971934171222222704&q=auto:ip&days=1&aqi=no&alerts=no", 
                 type: "GET",

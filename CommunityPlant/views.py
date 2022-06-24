@@ -148,6 +148,7 @@ def perfil(request):
 
     contexto = {} 
     contexto['esta_logueado'] = False
+    contexto['esta_suscrito'] = False
     if request.method == 'GET':
         if 'user' in request.session:
             contexto['esta_logueado'] = True
@@ -156,7 +157,6 @@ def perfil(request):
     return render(request, 'CommunityPlant/perfil.html',contexto)
     
 def borrarperfil(request):
-
     contexto = {} 
     contexto['esta_logueado'] = False
     data = dict(request.POST)
@@ -178,9 +178,15 @@ def borrarperfil(request):
             contexto['esta_logueado'] = True
             contexto['Usuario'] = request.session['user']
             print("error")
-        
-        
     return render(request,'CommunityPlant/index.html')
+
+def suscripcion(request):
+    if 'user' in request.session:
+        usuario = Usuarios.objects.get(username = request.session['user']['username'])
+        usuario.suscripcion = not usuario.suscripcion
+        usuario.save()
+        request.session['user'] = model_to_dict(usuario)
+    return redirect(to='Perfil')
 
 def resetPassword(request):
     context = {}
@@ -226,25 +232,18 @@ def catalogo(request):
                 #plantaComprar.stockPlanta -= cant
                 #plantaComprar.save()
                 try:
-                    print('try1')
                     if plantaComprar.nombrePlanta not in request.session['carrito']:
-                        print('try1 if')
                         request.session['carrito'][plantaComprar.nombrePlanta] = {'cantidad':cant, 'precio_unitario':plantaComprar.precioPlanta}
                     else:
-                        print('try1 else')
                         request.session['carrito'][plantaComprar.nombrePlanta]['cantidad'] += cant
                 except KeyError as e:
-                    print('try1 except')
                     request.session['carrito'] = {}
                     request.session['carrito'][plantaComprar.nombrePlanta] = {'cantidad':cant, 'precio_unitario':plantaComprar.precioPlanta}
-    try:
-        print('try2')
+    try: 
         datos['carrito'] = request.session['carrito']
     except KeyError as e:
-        print('try2 except')
         datos['carrito'] = {}
         request.session['carrito'] = {}
-    print(datos)
     return render(request, 'CommunityPlant/catalogo.html', datos)
 
 def limpiarCarroto(request):
@@ -258,7 +257,11 @@ def boleton(request):
         datos = {}
         datos['carrito'] = request.session['carrito']
         precioTotal = sum([int(j['cantidad']) * int(j['precio_unitario']) for i, j in request.session['carrito'].items()])
-        print(precioTotal)
+        descuento = int(request.session['descuento']) if 'descuento' in request.session else 0
+        print('El descuento de la sesion es de ' + str(request.session['descuento']))
+        print('El descuento final es de ' + str(descuento))
+        request.session['descuento'] = 0
+        precioTotal = int(precioTotal - (precioTotal*(descuento)/100))
         boletita = boleta(precioTotal = precioTotal, fecha = datetime.datetime.now())
         boletita.save()
         datos['boleta'] = boletita
@@ -268,5 +271,10 @@ def boleton(request):
             planta.save()
         request.session['carrito'] = {}
         return render(request, 'CommunityPlant/boleta.html', datos)
+
+def seguimiento(request):
+    return render(request, 'CommunityPlant/seguimiento.html')
+
+
 
 # Create your views here.datos

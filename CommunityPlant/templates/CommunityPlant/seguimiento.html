@@ -9,6 +9,7 @@
     <!-- CSS Personalizado -->
     {% load static %}
     <link rel="stylesheet" href="{% static 'CommunityPlant/css/style.css'%}">
+    <link rel="stylesheet" href="{% static 'CommunityPlant/css/stylesegui.css'%}">
     <link rel="icon" href="{% static 'CommunityPlant/img/logo.png'%}">
     <title>Community Plant</title>
   </head>
@@ -40,10 +41,10 @@
                 <a class="nav-link" href="quienesSomos.html">Quienes somos</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" style="color: #FFFFFF;" aria-current="page" href="#">Catalogo</a>
+                <a class="nav-link" aria-current="page" href="catalogo.html">Catalogo</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="seguimiento.html">Seguimiento</a>
+                <a class="nav-link active" style="color: #FFFFFF;" aria-current="page" href="#">Seguimiento</a>
               </li>
             </li>
           </ul>
@@ -53,113 +54,70 @@
             <li class="d-flex ms-auto" style="color: #FFFFFF;" id="fecha">
             </li>
           </div>
-          <div>
-            <li class="d-flex">
-              <input type="button" value="Carrito: {{carrito|length}}" class="btn btn-light btn-outline-success" data-bs-dismiss="offcanvas" data-bs-toggle="modal" data-bs-target="#modalCarrito" name="carrito-btn">
-            </li>
-          </div>
         </div>
       </div>
     </nav>
 
-                    <!-- Modal -->
-                    <div class="modal fade " id="modalCarrito" data-bs-backdrop="false" data-bs-keyboard="false" tabindex="1" aria-labelledby="modalCarrito" aria-hidden="true" style="background-color: #00000097;">
-                      <div class="modal-dialog modal-dialog-centered modal-lg">
-                        <div class="modal-content">
-                          <div class="text-center">
-                            <div class="modal-header pt-0 pb-0 border-0">
-                              <h1 class="modal-title pt-0 pb-0" id="tituloModalCarrito">Carrito</h1>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-
-                              {% if carrito|length == 0 %}
-                                <p>El carrito esta vacio</p>
-                              {% else %}
-                                {% for producto,valor in carrito.items %}
-                                <fieldset class="border p-2">
-                                  <legend class="w-auto">{{producto}}</legend>
-                                  <p class="m-0 p-0">Cantidad: {{valor.cantidad}}</p>
-                                  <p class="m-0 p-0">Valor unitario: ${{valor.precio_unitario}}</p>
-                                  <p class="m-0 p-0">Precio: ${% widthratio valor.cantidad 1 valor.precio_unitario %}</p>
-                                  {% csrf_token %}
-                                </fieldset >
-                                {% endfor %}
-                              {% endif %}
-                            </div>
-                            <div class="modal-footer">
-                              <label for="cantidad">Codigo Descuento:</label>
-                              <input class="input-sm" type="text" name="inputDes" id="inputDes" value='' max=" "min="" role="button">
-                              <button type="button" class="btn btn-outline-warning" name="checkDescuento" id="checkDescuento">Checkear descuento</button>
-                              <a href="/limpiarCarroto/" class="btn btn-secondary">Vaciar carrito</a>
-                              {% if carrito|length == 0 %}
-                              <a  class="btn btn-success disabled">Comprar</a>
-                              {% else %}
-                              <a href="/boleta/" target="_blank" class="btn btn-success">Comprar</a>
-                              {% endif %}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-    <!-- Galeria de fotos -->
-
-    <!-- interiores -->
-    <div><h5 class="display-3" style="margin-left: 1%;margin: top 0;">Catalogo</h5></div>
-
-  
-    <div style="margin-top: 1%;">
-        <div class="container">
-            <div class="row">
-                {% for ca in cartas %}
-                
-                <div class="col d-flex justify-content-center"style="margin-left: auto; margin-right: auto; margin-bottom: 5%;">
-                           
-                <div class="card" style="width: 18rem;">
-                        <div class="carousel-item active" data-bs-interval="2000">
-                          <img src="{{ ca.imagenPlanta }}" class="d-block w-100">
-                        </div>
-                    <div class="card-body d-flex flex-column">
-                      <h5 class="card-title">{{ca.nombrePlanta}}</h5>
-                      <p class="card-text">{{ca.descripcionPlanta}}</p>
-                      <p class="card-text">Precio: {{ca.precioPlanta}}</p>
-                      <p class="card-text">Categoria: {{ca.categoria.nombreCategoria}}</p>
-                      <p class="card-text">Stock disponible: {{ca.stockPlanta}}</p>
-                        <!-- Inicio Boton Detalles-->
-                        <div style="align-items: center;">
-                          <div class="row">
-                          <div class="col">
-                            <div class="m-0 p-0">
-                              <form class="row" name="comprar" action="catalogo.html" method="post" id="formComprar">
-                                {% csrf_token %}
-                                <div class="col-auto mb-3">
-                                  <label for="cantidad">Cantidad a pedir:</label>
-                                  <input class="form-control" type="number" name="cantidad" id="cantidad" value='1' max={{ca.stockPlanta}} min=1 role="button">
-                                </div>
-                                <input class="col-auto btn btn-success w-100" type="submit" value="Añadir al carrito" name="comprar-btn" id="comprar-btn" role="button">
-                                <input class="btn btn-success" type="hidden" name="nombre" id="nombre" value='{{ca.nombrePlanta}}' role="button">
-                               </form>
-                            </div>
-                          </div>
-                        </div>      
-                      </div> 
-                    </div>
-                    <!-- Fin Boton Detalles-->
-                  </div>
-                </div>
-              </form>
-            {% endfor %}
-                </div>
-
-            </div>
+    <div class="container min-vh-100" id="formcontainer">
+        <div class="row pt-5 align-items-center">
+            <h1 class="display-3 text-center"><b>Seguimiento De Pedido</b></h1>
+            <hr class="bg-info">
         </div>
-     
+        <div class="container">
+            <div class="text-center" style="margin-top: 2%">
+                <h5>Ingrese numero de seguimiento</h5>
+                <input id='consultaSeguimiento' name='consultaSeguimiento' type="text">
+                <button type="button" name="btnConsultaPedido" id="btnConsultaPedido" class="btn btn-success d-grid mx-auto" style="margin-top: 1%;">Consultar pedido</button>
+                <p id="mensajeConsulta" name="mensajeConsulta"></p>
+              </div>
+              <div name="progreso" id="progreso" class="container">
+                <div class='progress'>
+                  <div id="barrita_progreso" class='progress-bar progress-bar-striped progress-bar-animated bg-success' role='progressbar' style='width: 0%'></div>
+                </div>
+                  <div class='row'>
+                    <div class='col'>
+                        <center>
+                          <svg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-truck-delivery' width='60' height='60' viewBox='0 0 24 24' stroke-width='1.5' stroke='#2c3e50' fill='none' stroke-linecap='round' stroke-linejoin='round'>
+                          <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
+                          <circle cx='7' cy='17' r='2' />
+                          <circle cx='17' cy='17' r='2' />
+                          <path d='M5 17h-2v-4m-1 -8h11v12m-4 0h6m4 0h2v-6h-8m0 -5h5l3 5' />
+                          <line x1='3' y1='9' x2='7' y2='9' />
+                        </svg>
+                        <p>Se esta preparando el paquete</p>
+                      </center>
+                    </div>
+                    <div class='col'>
+                      <center>
+                      <svg style='text-align:center ;' xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-package' width='60' height='60' viewBox='0 0 24 24' stroke-width='1.5' stroke='#2c3e50' fill='none' stroke-linecap='round' stroke-linejoin='round'>
+                        <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
+                        <polyline points='12 3 20 7.5 20 16.5 12 21 4 16.5 4 7.5 12 3' />
+                        <line x1='12' y1='12' x2='20' y2='7.5' />
+                        <line x1='12' y1='12' x2='12' y2='21' />
+                        <line x1='12' y1='12' x2='4' y2='7.5' />
+                        <line x1='16' y1='5.25' x2='8' y2='9.75' />
+                      </svg>
+                      <p>El paquete esta en camino</p>
+                    </center>
+                    </div>
+                    <div class='col'>
+                      <center>
+                      <svg style='text-align:center ;' xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-home' width='60' height='60' viewBox='0 0 24 24' stroke-width='1.5' stroke='#2c3e50' fill='none' stroke-linecap='round' stroke-linejoin='round'>
+                        <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
+                        <polyline points='5 12 3 12 12 3 21 12 19 12' />
+                        <path d='M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7' />
+                        <path d='M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6' />
+                      </svg>
+                      <p>El paquete ha llegado a su destino</p>
+                      <p id='destinoPaquete'></p>
+                    </center>
+                    </div>
+                  </div>
+              </div>
+        </div>
     </div>
-
-
  <!-- Footer de la pagina --> 
- <div style="background-color: #04a05f59; margin-top: 2%;">
+ <div class='mt-auto' style="background-color: #04a05f59; margin-top: 2%;">
   <footer class="container py-4">
     <div class="row">
       <div class="col-md">
@@ -202,9 +160,8 @@
 
   <!-- Fin de la pagina -->
     <!-- Mi js! -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js" ></script>
-    <script src="{% static 'CommunityPlant/js/apiDescuento.js'%}"> </script>
     
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" ></script>
     <!-- Option 1: Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 
@@ -214,7 +171,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
     -->
     <script src="{% static 'CommunityPlant/js/JsonConversion.js'%} "></script>
-    <script src="{% static 'CommunityPlant/js/apiDescuento.js' %}"></script>
+    <script src="{% static 'CommunityPlant/js/seguimiento.js'%}" ></script>
   </body>
   
 </html>
